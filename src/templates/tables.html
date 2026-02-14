@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>DB Tables</h1>
+
+  <h2>Manufacturers</h2>
+  <table>
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+    </tr>
+    {% for item in manufacturers %}
+      <tr>
+        <td>{{ item.id }}</td>
+        <td>{{ item.name }}</td>
+      </tr>
+    {% endfor %}
+  </table>
+
+  <h2>Product Types</h2>
+  <table>
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+    </tr>
+    {% for item in product_types %}
+      <tr>
+        <td>{{ item.id }}</td>
+        <td>{{ item.name }}</td>
+      </tr>
+    {% endfor %}
+  </table>
+
+  <h2>Price List</h2>
+  <table>
+    <tr>
+      <th>ID</th>
+      <th>Unit Price</th>
+      <th>Manufacturer ID</th>
+      <th>Product Type ID</th>
+    </tr>
+    {% for item in price_list %}
+      <tr>
+        <td>{{ item.id }}</td>
+        <td>{{ item.unit_price }}</td>
+        <td>{{ item.manufacturer_id }}</td>
+        <td>{{ item.product_type_id }}</td>
+      </tr>
+    {% endfor %}
+  </table>
+
+  <h2>Sales</h2>
+  <table>
+    <tr>
+      <th>ID</th>
+      <th>Amount</th>
+      <th>Sale Date</th>
+      <th>Payment Date</th>
+      <th>Price List ID</th>
+    </tr>
+    {% for item in sales %}
+      <tr>
+        <td>{{ item.id }}</td>
+        <td>{{ item.amount }}</td>
+        <td>{{ item.sale_date }}</td>
+        <td>{{ item.payment_date }}</td>
+        <td>{{ item.price_list_id }}</td>
+      </tr>
+    {% endfor %}
+  </table>
+{% endblock %}
