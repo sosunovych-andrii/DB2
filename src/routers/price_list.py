@@ -1,8 +1,9 @@
 from fastapi import APIRouter, Request, Depends, Query, Form
 from fastapi.responses import HTMLResponse
-from sqlalchemy import select, insert, update
+from sqlalchemy import select, insert, update, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.constants import PAGE_SIZE
 from src.database.models import ManufacturerModel, ProductTypeModel
 from src.database.settings import get_db
 from src.database.models import PriceListModel
@@ -11,12 +12,13 @@ from src.templates_config import templates
 router = APIRouter(prefix="/price-list")
 
 
-@router.get("/", response_class=HTMLResponse)
+@router.get(path="/", response_class=HTMLResponse)
 async def get_price_list(
-    request: Request,
-    db: AsyncSession = Depends(get_db),
-    min_price: str | None = Query(None),
-    max_price: str | None = Query(None)
+        request: Request,
+        db: AsyncSession = Depends(get_db),
+        min_price: str | None = None,
+        max_price: str | None = None,
+        page: int = Query(1, ge=1, description="Номер сторінки")
 ):
     query = select(PriceListModel)
 
@@ -32,6 +34,14 @@ async def get_price_list(
         except ValueError:
             pass
 
+    count_query = select(func.count()).select_from(query.subquery())
+    total = await db.scalar(count_query)
+
+    offset = (page - 1) * PAGE_SIZE
+    query = query.order_by(PriceListModel.id) \
+        .offset(offset) \
+        .limit(PAGE_SIZE)
+
     result = await db.execute(query)
     price_list = result.scalars().all()
 
@@ -41,7 +51,11 @@ async def get_price_list(
             "request": request,
             "price_list": price_list,
             "min_price": min_price or "",
-            "max_price": max_price or ""
+            "max_price": max_price or "",
+            "page": page,
+            "total_pages": (total + PAGE_SIZE - 1) // PAGE_SIZE if total else 1,
+            "has_prev": page > 1,
+            "has_next": page * PAGE_SIZE < total,
         }
     )
 
@@ -114,9 +128,9 @@ async def create_price(
 
 @router.get(path="/update/{id}/", response_class=HTMLResponse)
 async def update_price_list_form(
-    request: Request,
-    id: int,
-    db: AsyncSession = Depends(get_db)
+        request: Request,
+        id: int,
+        db: AsyncSession = Depends(get_db)
 ):
     price = await db.get(PriceListModel, id)
     manufacturers = (await db.execute(select(ManufacturerModel))).scalars().all()
@@ -133,12 +147,12 @@ async def update_price_list_form(
 
 @router.post(path="/update/{id}/", response_class=HTMLResponse)
 async def update_price_list(
-    request: Request,
-    id: int,
-    unit_price: float | None = Form(None),
-    manufacturer_id: int | None = Form(None),
-    product_type_id: int | None = Form(None),
-    db: AsyncSession = Depends(get_db)
+        request: Request,
+        id: int,
+        unit_price: float | None = Form(None),
+        manufacturer_id: int | None = Form(None),
+        product_type_id: int | None = Form(None),
+        db: AsyncSession = Depends(get_db)
 ):
     try:
         if unit_price <= 0:
@@ -186,5 +200,3 @@ async def update_price_list(
 
             <a href="/price-list/update/{id}/">Назад до форми</a>
         """)
-
-

@@ -1,10 +1,11 @@
 from datetime import datetime
 
-from fastapi import APIRouter, Request, Depends, Form
+from fastapi import APIRouter, Request, Depends, Form, Query
 from fastapi.responses import HTMLResponse
 from sqlalchemy import select, func, insert, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.constants import PAGE_SIZE
 from src.database.models import PriceListModel
 from src.database.settings import get_db
 from src.database.models import SaleModel
@@ -18,13 +19,23 @@ async def get_sales(
         request: Request,
         db: AsyncSession = Depends(get_db),
         sale_date: str | None = None,
-        payment_date: str | None = None
+        payment_date: str | None = None,
+        page: int = Query(1, ge=1)
 ):
     query = select(SaleModel)
+
     if sale_date:
         query = query.where(func.date(SaleModel.sale_date) == sale_date)
     if payment_date:
         query = query.where(func.date(SaleModel.payment_date) == payment_date)
+
+    count_query = select(func.count()).select_from(query.subquery())
+    total = await db.scalar(count_query)
+
+    offset = (page - 1) * PAGE_SIZE
+    query = query.order_by(SaleModel.id) \
+        .offset(offset) \
+        .limit(PAGE_SIZE)
 
     result = await db.execute(query)
     sales = result.scalars().all()
@@ -35,7 +46,11 @@ async def get_sales(
             "request": request,
             "sales": sales,
             "sale_date": sale_date or "",
-            "payment_date": payment_date or ""
+            "payment_date": payment_date or "",
+            "page": page,
+            "total_pages": (total + PAGE_SIZE - 1) // PAGE_SIZE if total else 1,
+            "has_prev": page > 1,
+            "has_next": page * PAGE_SIZE < total,
         }
     )
 
@@ -109,9 +124,9 @@ async def create_sale(
 
 @router.get(path="/update/{id}/", response_class=HTMLResponse)
 async def update_sale_form(
-    request: Request,
-    id: int,
-    db: AsyncSession = Depends(get_db)
+        request: Request,
+        id: int,
+        db: AsyncSession = Depends(get_db)
 ):
     sale = await db.get(SaleModel, id)
     price_lists = (await db.execute(select(PriceListModel))).scalars().all()
@@ -125,13 +140,13 @@ async def update_sale_form(
 
 @router.post(path="/update/{id}/", response_class=HTMLResponse)
 async def update_sale(
-    request: Request,
-    id: int,
-    amount: int | None = Form(None),
-    sale_date: datetime | None = Form(None),
-    payment_date: datetime | None = Form(None),
-    price_list_id: int | None = Form(None),
-    db: AsyncSession = Depends(get_db)
+        request: Request,
+        id: int,
+        amount: int | None = Form(None),
+        sale_date: datetime | None = Form(None),
+        payment_date: datetime | None = Form(None),
+        price_list_id: int | None = Form(None),
+        db: AsyncSession = Depends(get_db)
 ):
     try:
         if amount <= 0:
