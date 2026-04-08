@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Request, Depends
 from fastapi.responses import HTMLResponse
-from fastapi.templating import Jinja2Templates
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -11,12 +10,12 @@ from src.database.models import (
     ManufacturerModel
 )
 from src.database.settings import get_db
+from src.templates_config import templates
 
 router = APIRouter()
-templates = Jinja2Templates(directory="src/templates")
 
 
-@router.get("/tables", response_class=HTMLResponse)
+@router.get(path="/tables", response_class=HTMLResponse)
 async def show_tables(request: Request, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(ManufacturerModel))
     manufacturers = result.scalars().all()

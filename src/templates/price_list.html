@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>Price List</h1>
+
+  <div
+      style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 15px; margin-right: 10px;">
+    <form method="get" style="flex:1;">
+      <input type="number" step="0.01" name="min_price" placeholder="Min price" value="{{ min_price }}">
+      <input type="number" step="0.01" name="max_price" placeholder="Max price" value="{{ max_price }}">
+      <button type="submit">Filter</button>
+    </form>
+
+    <a href="/price-list/create" style="
+      background-color: #28a745;
+      color: white;
+      padding: 12px 20px;
+      text-decoration: none;
+      border-radius: 4px;
+      margin-left: 10px;
+  ">Create</a>
+  </div>
+
+  {% if price_list %}
+    <table style="width:100%; border-collapse: collapse;">
+      <tr>
+        <th>ID</th>
+        <th>Unit Price</th>
+        <th>Manufacturer ID</th>
+        <th>Product Type ID</th>
+        <th>Actions</th>
+      </tr>
+
+      {% for item in price_list %}
+        <tr>
+          <td>{{ item.id }}</td>
+          <td>{{ item.unit_price }}</td>
+          <td>{{ item.manufacturer_id or "NULL" }}</td>
+          <td>{{ item.product_type_id or "NULL" }}</td>
+          <td style="background-color: #007bff; text-align:center;">
+            <a href="/price-list/update/{{ item.id }}" style="
+              color:white;
+              text-decoration:none;
+              display:inline-block;
+              width:100%;
+              height:100%;
+              padding:4px 0;
+          ">Update</a>
+          </td>
+        </tr>
+      {% endfor %}
+    </table>
+  {% else %}
+    <div style="text-align:center; color:black; padding:20px; border:1px solid #ddd; margin-top:10px;">
+      No results found
+    </div>
+  {% endif %}
+
+{% endblock %}

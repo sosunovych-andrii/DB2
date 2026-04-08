@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Update Manufacturer</h1>
+<form method="post" style="max-width:400px;">
+    <label>Name:</label><br>
+    <input type="text" name="name" value="{{ manufacturer.name }}"><br><br>
+
+    <button type="submit"
+        style="background-color: #007bff; color:white; padding:10px; border:none;">
+        Update
+    </button>
+</form>
+
+{% endblock %}

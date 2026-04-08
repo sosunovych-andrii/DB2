@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Create Sale</h1>
+
+{% if error %}
+<div style="background-color:#f8d7da; color:#721c24; padding:10px; margin-bottom:15px;">
+    {{ error }}
+</div>
+{% endif %}
+
+<form method="post" style="max-width:400px;">
+
+    <label>Amount:</label><br>
+    <input type="number" name="amount"
+           value="{{ form_data.amount | default('') }}"><br><br>
+
+    <label>Sale date:</label><br>
+    <input type="datetime-local" name="sale_date"
+           value="{{ form_data.sale_date | default('') }}"><br><br>
+
+    <label>Payment date:</label><br>
+    <input type="datetime-local" name="payment_date"
+           value="{{ form_data.payment_date | default('') }}"><br><br>
+
+    <label>Price list:</label><br>
+    <select name="price_list_id">
+        <option value="">-- Select --</option>
+        {% for p in price_lists %}
+            <option value="{{ p.id }}"
+                {% if form_data.price_list_id == p.id %}selected{% endif %}>
+                {{ p.id }} - {{ p.unit_price }}
+            </option>
+        {% endfor %}
+    </select><br><br>
+
+    <button type="submit"
+        style="background-color:#28a745; color:white; padding:10px; border:none;">
+        Create
+    </button>
+</form>
+
+{% endblock %}
