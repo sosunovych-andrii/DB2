@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+  <h2>Register</h2>
+
+  <form method="post">
+
+    <input name="name" placeholder="Name" required>
+    <br><br>
+
+    <input name="email" type="email" placeholder="Email" required>
+    <br><br>
+
+    <input name="password" type="password" placeholder="Password" required>
+    <br><br>
+
+    {#  <input name="url" type="url" placeholder="Website URL">#}
+    {#  <br><br>#}
+
+    <input name="phone" type="text" placeholder="Phone">
+    <br><br>
+
+    <button type="submit">Register</button>
+  </form>
+
+  <br>
+
+  <p>
+    Вже є акаунт?
+    <a href="/login">Увійти</a>
+  </p>
+
+{% endblock %}

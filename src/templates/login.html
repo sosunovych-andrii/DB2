@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+  <h2>Login</h2>
+
+  <form method="post">
+    <input name="email" type="email" placeholder="Email" required>
+    <br><br>
+
+    <input name="password" type="password" placeholder="Password" required>
+    <br><br>
+
+    <button type="submit">Login</button>
+  </form>
+
+
+  <br>
+
+  <p>
+    Немає акаунта?
+    <a href="/register">Зареєструйтесь</a>
+  </p>
+
+{% endblock %}
