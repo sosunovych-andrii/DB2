@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Query 2</h2>
+
+<form method="get">
+  <input type="date" name="date_from">
+  <input type="date" name="date_to">
+  <button type="submit">OK</button>
+</form>
+
+<p>Кількість замовлень: {{ count }}</p>
+
+{% endblock %}

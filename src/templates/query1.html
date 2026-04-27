@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Query 1</h2>
+
+<form method="get">
+  <input name="firm_name" placeholder="Назва фірми">
+  <button type="submit">Пошук</button>
+</form>
+
+<table>
+  <tr>
+    <th>Order</th>
+    <th>Product</th>
+    <th>Firm</th>
+    <th>Qty</th>
+    <th>Price</th>
+    <th>Total</th>
+  </tr>
+
+  {% for r in rows %}
+  <tr>
+    <td>{{ r[0] }}</td>
+    <td>{{ r[1] }}</td>
+    <td>{{ r[2] }}</td>
+    <td>{{ r[3] }}</td>
+    <td>{{ r[4] }}</td>
+    <td>{{ r[5] }}</td>
+  </tr>
+  {% endfor %}
+</table>
+
+{% endblock %}
