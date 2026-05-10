@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+  <h2>Procedure 5</h2>
+  <p>
+    Для всіх товарів загальну кількість та загальну вартість реалізації за деякий місяць деякого року (значення
+    параметрів для розрахункових полів Рік та Місяць, що будуються по полю Дата реалізації, повинні вводитись під час
+    виконання запиту)
+  </p>
+
+  <form method="post">
+
+    <p>
+      <label>Year:</label>
+      <input type="number" name="target_year">
+    </p>
+
+    <p>
+      <label>Month:</label>
+      <input type="number" name="target_month">
+    </p>
+
+    <button type="submit">
+      Execute
+    </button>
+
+  </form>
+
+  {% if rows %}
+
+    <table>
+      <thead>
+      <tr>
+        <th>Фірма</th>
+        <th>Загальна кількість</th>
+        <th>Загальна вартість</th>
+      </tr>
+      </thead>
+
+      <tbody>
+      {% for row in rows %}
+        <tr>
+          <td>{{ row["Найменування фірми-виробника"] }}</td>
+          <td>{{ row["Загальна кількість реалізації"] }}</td>
+          <td>{{ row["Загальна вартість реалізації"] }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+
+  {% endif %}
+
+{% endblock %}
