@@ -190,8 +190,8 @@ async def p1_page(request: Request):
 @router.post(path="/p1/", response_class=HTMLResponse)
 async def p1_execute(
     request: Request,
-    start_date: str = Form(...),
-    end_date: str = Form(...),
+    start_date: str = Form(None),
+    end_date: str = Form(None),
     db: AsyncSession = Depends(get_db)
 ):
 
@@ -248,7 +248,7 @@ async def p3_page(request: Request):
 @router.post(path="/p3/", response_class=HTMLResponse)
 async def p3_execute(
     request: Request,
-    num_days: int = Form(...),
+    num_days: int = Form(None),
     db: AsyncSession = Depends(get_db)
 ):
 
@@ -348,3 +348,213 @@ async def p5_execute(
             "rows": result.mappings().all()
         }
     )
+
+
+@router.get(path="/query9/", response_class=HTMLResponse)
+async def query9(
+    request: Request,
+    db: AsyncSession = Depends(get_db)
+):
+
+    sql = text("""
+        SELECT
+            CONCAT(dtt.name, ' - ', dfv.name) AS full_name,
+
+            ROUND(
+                SUM(
+                    CASE
+                        WHEN QUARTER(rt.date_realization) = 1
+                        THEN
+                            IF(
+                                rt.amount <= 15,
+                                (pt.price * 1.03) * rt.amount,
+                                pt.price * rt.amount
+                            )
+                        ELSE 0
+                    END
+                ),
+                2
+            ) AS q1_total,
+
+            ROUND(
+                SUM(
+                    CASE
+                        WHEN QUARTER(rt.date_realization) = 2
+                        THEN
+                            IF(
+                                rt.amount <= 15,
+                                (pt.price * 1.03) * rt.amount,
+                                pt.price * rt.amount
+                            )
+                        ELSE 0
+                    END
+                ),
+                2
+            ) AS q2_total,
+
+            ROUND(
+                SUM(
+                    CASE
+                        WHEN QUARTER(rt.date_realization) = 3
+                        THEN
+                            IF(
+                                rt.amount <= 15,
+                                (pt.price * 1.03) * rt.amount,
+                                pt.price * rt.amount
+                            )
+                        ELSE 0
+                    END
+                ),
+                2
+            ) AS q3_total,
+
+            ROUND(
+                SUM(
+                    CASE
+                        WHEN QUARTER(rt.date_realization) = 4
+                        THEN
+                            IF(
+                                rt.amount <= 15,
+                                (pt.price * 1.03) * rt.amount,
+                                pt.price * rt.amount
+                            )
+                        ELSE 0
+                    END
+                ),
+                2
+            ) AS q4_total,
+
+            ROUND(
+                SUM(
+                    IF(
+                        rt.amount <= 15,
+                        (pt.price * 1.03) * rt.amount,
+                        pt.price * rt.amount
+                    )
+                ),
+                2
+            ) AS total_sum
+
+        FROM realizatsia_tovariv AS rt
+
+        INNER JOIN preyskurant_tovariv AS pt
+            ON rt.id_preyskurant = pt.id
+
+        INNER JOIN dovidnyk_typiv_tovariv AS dtt
+            ON pt.id_type_tovar = dtt.id
+
+        INNER JOIN dovidnyk_firmu_vyrobnyka AS dfv
+            ON pt.id_firm = dfv.id
+
+        GROUP BY
+            dtt.name,
+            dfv.name
+
+        ORDER BY
+            full_name
+    """)
+
+    result = await db.execute(sql)
+
+    return templates.TemplateResponse(
+        "lab4_query9.html",
+        {
+            "request": request,
+            "rows": result.mappings().all()
+        }
+    )
+
+
+@router.get(path="/query10/", response_class=HTMLResponse)
+async def query10_page(request: Request):
+
+    return templates.TemplateResponse(
+        "lab4_query10.html",
+        {
+            "request": request,
+            "rows": None
+        }
+    )
+
+
+@router.post(path="/query10/", response_class=HTMLResponse)
+async def query10_execute(
+    request: Request,
+    start_date: str = Form(None),
+    end_date: str = Form(None),
+    db: AsyncSession = Depends(get_db)
+):
+
+    sql = text("""
+        SELECT
+            CONCAT(dtt.name, ' - ', dfv.name) AS full_name,
+
+            pt.price AS price
+
+        FROM preyskurant_tovariv AS pt
+
+        INNER JOIN dovidnyk_typiv_tovariv AS dtt
+            ON pt.id_type_tovar = dtt.id
+
+        INNER JOIN dovidnyk_firmu_vyrobnyka AS dfv
+            ON pt.id_firm = dfv.id
+
+        WHERE pt.id NOT IN (
+
+            SELECT
+                rt.id_preyskurant
+
+            FROM realizatsia_tovariv AS rt
+
+            WHERE
+                rt.date_realization
+                BETWEEN :start_date AND :end_date
+        )
+
+        ORDER BY full_name
+    """)
+
+    result = await db.execute(
+        sql,
+        {
+            "start_date": start_date,
+            "end_date": end_date
+        }
+    )
+
+    return templates.TemplateResponse(
+        "lab4_query10.html",
+        {
+            "request": request,
+            "rows": result.mappings().all()
+        }
+    )
+
+
+@router.get(path="/")
+async def lab_4():
+    return HTMLResponse("""
+        <h3>Queries</h3>
+
+        <ul>
+            <li><a href="/lab4/query1/">Query 1</a></li>
+            <li><a href="/lab4/query2/">Query 2</a></li>
+            <li><a href="/lab4/query3/">Query 3</a></li>
+            <li><a href="/lab4/query9/">Query 9</a></li>
+            <li><a href="/lab4/query10/">Query 10</a></li>
+        </ul>
+
+        <h3>Procedures</h3>
+
+        <ul>
+            <li><a href="/lab4/p1/">Procedure 1</a></li>
+            <li><a href="/lab4/p2/">Procedure 2</a></li>
+            <li><a href="/lab4/p3/">Procedure 3</a></li>
+            <li><a href="/lab4/p4/">Procedure 4</a></li>
+            <li><a href="/lab4/p5/">Procedure 5</a></li>
+        </ul>
+
+        <br>
+
+        <a href="/">На головну</a>
+    """)

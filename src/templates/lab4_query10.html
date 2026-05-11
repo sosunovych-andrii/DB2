@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+  <h2>Query 10</h2>
+  <p>
+    Визначити найменування товару (найменування типу товару і фірми-виробника) та їх ціну, які не реалізовувались за
+    обраний період часу. Нижній та верхній проміжок часу повинно вводитись під час виконання запиту у вигляді
+    параметрів.
+  </p>
+
+  <form method="post">
+
+    <p>
+      <label>Start date:</label>
+      <input type="date" name="start_date">
+    </p>
+
+    <p>
+      <label>End date:</label>
+      <input type="date" name="end_date">
+    </p>
+
+    <button type="submit">
+      Execute
+    </button>
+
+  </form>
+
+  {% if rows %}
+
+    <table>
+      <thead>
+      <tr>
+        <th>Товар</th>
+        <th>Ціна</th>
+      </tr>
+      </thead>
+
+      <tbody>
+      {% for row in rows %}
+        <tr>
+          <td>{{ row.full_name }}</td>
+          <td>{{ row.price }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+
+  {% endif %}
+
+{% endblock %}

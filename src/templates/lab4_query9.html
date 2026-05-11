@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+  <h2>Query 9</h2>
+  <p>
+    На основі перехресного запиту отримати дані про перехресний запит про поквартальний продаж товарів фірм-виробників
+    та їх загальну вартість
+  </p>
+  <table>
+    <thead>
+    <tr>
+      <th>Товар</th>
+      <th>1 квартал</th>
+      <th>2 квартал</th>
+      <th>3 квартал</th>
+      <th>4 квартал</th>
+      <th>Загальна вартість</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    {% for row in rows %}
+      <tr>
+        <td>{{ row.full_name }}</td>
+        <td>{{ row.q1_total }}</td>
+        <td>{{ row.q2_total }}</td>
+        <td>{{ row.q3_total }}</td>
+        <td>{{ row.q4_total }}</td>
+        <td>{{ row.total_sum }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+
+{% endblock %}
