@@ -6,14 +6,32 @@ services:
       MYSQL_ROOT_PASSWORD: password
       MYSQL_DATABASE: my_database
     ports:
-      - "3007:3306"
+      - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 15
+      start_period: 30s
+
+  mongodb:
+    image: mongo:6
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  mongo-express:
+    image: mongo-express
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_URL: mongodb://mongodb:27017
+    depends_on:
+      - mongodb
 
   app:
     build: .
@@ -21,6 +39,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      mongodb:
+        condition: service_started
     ports:
       - "8000:8000"
     volumes:
@@ -28,3 +48,4 @@ services:
 
 volumes:
   mysql_data:
+  mongo_data:

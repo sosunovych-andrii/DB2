@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Запит 3: ТОП-5 за кількістю реалізації</h2>
+
+<table>
+    <tr>
+        <th>Виробник</th>
+        <th>Тип товару</th>
+        <th>Ціна реалізації</th>
+        <th>Кількість</th>
+        <th>Дата реалізації</th>
+    </tr>
+
+    {% for row in data %}
+    <tr>
+        <td>{{ row.manufacturer }}</td>
+        <td>{{ row.product_type }}</td>
+        <td>{{ row.unit_price }}</td>
+        <td>{{ row.amount }}</td>
+        <td>{{ row.sale_date[:10] if row.sale_date else '-' }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="5">Дані не знайдено</td></tr>
+    {% endfor %}
+</table>
+
+{% endblock %}

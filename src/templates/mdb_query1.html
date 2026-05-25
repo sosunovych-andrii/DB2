@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Запит 1: Замовлення товарів за квітень 2004 року</h2>
+
+<table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 100%;">
+    <tr>
+        <th>Номер замовлення</th>
+        <th>Назва дистріб'ютора</th>
+        <th>Адреса дистріб'ютора</th>
+        <th>Дата замовлення</th>
+        <th>Дата сплати</th>
+        <th>Кількість</th>
+        <th>Вартість</th>
+    </tr>
+
+    {% for row in data %}
+    <tr>
+        <td>{{ row['Номер замовлення'] }}</td>
+        <td>{{ row['Назва дистрібютора'] }}</td>
+        <td>{{ row['Адреса дистрібютора'] }}</td>
+        <td>{{ row['Дата замовлення'] }}</td>
+        <td>{{ row['Дата сплати'] if row['Дата сплати'] else '—' }}</td>
+        <td>{{ row['Кількість'] }}</td>
+        <td>{{ row['Вартість'] }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="7" style="text-align:center; color:red;">Дані не знайдено</td></tr>
+    {% endfor %}
+</table>
+
+{% endblock %}
